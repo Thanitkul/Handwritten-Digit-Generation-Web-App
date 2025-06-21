@@ -38,7 +38,7 @@ def load_generator():
     latent_dim = 100
     num_classes = 10
     model = Generator(latent_dim, num_classes)
-    model.load_state_dict(torch.load("models/generator_epoch20.pth", map_location="cpu"))
+    model.load_state_dict(torch.load("models/generator.pth", map_location="cpu"))
     model.eval()
     return model
 
