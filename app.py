@@ -8,21 +8,24 @@ import numpy as np
 class Generator(nn.Module):
     def __init__(self, latent_dim, num_classes):
         super().__init__()
-        self.label_emb = nn.Embedding(num_classes, num_classes)
+        self.label_emb = nn.Embedding(num_classes, latent_dim)
         self.model = nn.Sequential(
-            nn.Linear(latent_dim + num_classes, 128),
-            nn.ReLU(),
-            nn.Linear(128, 256),
-            nn.BatchNorm1d(256),
-            nn.ReLU(),
-            nn.Linear(256, 28*28),
+            nn.ConvTranspose2d(latent_dim, 128, 7, 1, 0, bias=False),  # 1x1 → 7x7
+            nn.BatchNorm2d(128),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(128, 64, 4, 2, 1, bias=False),          # 7x7 → 14x14
+            nn.BatchNorm2d(64),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(64, 1, 4, 2, 1, bias=False),            # 14x14 → 28x28
             nn.Tanh()
         )
 
     def forward(self, z, labels):
-        input = torch.cat((z, self.label_emb(labels)), dim=1)
-        img = self.model(input)
-        return img.view(-1, 1, 28, 28)
+        label_emb = self.label_emb(labels)               # shape: [B, latent_dim]
+        x = z * label_emb                                # element-wise mult
+        x = x.view(x.size(0), x.size(1), 1, 1)           # reshape for conv input
+        return self.model(x)
+
 
 # --- App Settings ---
 st.set_page_config(page_title="MNIST Digit Generator", layout="wide")
