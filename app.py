@@ -29,8 +29,8 @@ st.set_page_config(page_title="MNIST Digit Generator", layout="wide")
 st.title("🧠 Handwritten Digit Generator")
 st.markdown("Pick a digit (0–9) and view 5 generated samples using a GAN.")
 
-# --- Sidebar for Digit Selection ---
-digit = st.sidebar.selectbox("Select Digit (0–9)", list(range(10)), index=0)
+# --- Top-of-page Digit Selector ---
+digit = st.selectbox("Select Digit (0–9)", list(range(10)), index=0)
 
 # --- Load Generator Model ---
 @st.cache_resource
